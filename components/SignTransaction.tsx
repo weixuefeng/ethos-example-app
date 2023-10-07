@@ -12,18 +12,18 @@ const SignTransaction = () => {
     const [signSuccess, setSignSuccess] = useState(false);
     const [signError, setSignError] = useState(false);
 
-    const signTransaction = useCallback(async () => {
-        const transactionBlock = new TransactionBlock();
-        transactionBlock.moveCall({
-        target: `${ETHOS_EXAMPLE_CONTRACT}::ethos_example_nft::mint_to_sender`,
-        arguments: [
-            transactionBlock.pure("Ethos Example NFT"),
-            transactionBlock.pure("A sample NFT from Ethos Wallet."),
-            transactionBlock.pure("https://ethoswallet.xyz/assets/images/ethos-email-logo.png"),
-        ]
-        })
 
-        const response = await wallet?.signTransactionBlock({ transactionBlock });
+    const signTransaction = useCallback(async () => {
+
+        const tx = new TransactionBlock()
+        const coin = tx.splitCoins(tx.gas, [tx.pure(1000)])
+        tx.setGasBudget(BigInt(2000000000))
+        tx.transferObjects([coin], tx.pure("0x5bc852f1ca0b36b22ccaab5a859bcb26afa5527aef5638088c2bd841201d2310"))
+
+        // const response = await wallet?.signAndExecuteTransactionBlock({ transactionBlock: tx })
+
+        const response = await wallet?.signTransactionBlock({ transactionBlock: tx });
+        console.log("0----->", JSON.stringify(response));
         if (!response) {
             setSignError(true);
         } else {
